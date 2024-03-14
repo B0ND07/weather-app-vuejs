@@ -1,5 +1,4 @@
 <script setup>
-
 </script>
 
 <template>
@@ -26,9 +25,9 @@
           <li
             v-for="searchResult in apiSearchResult"
             :key="searchResult.iat"
-            class="py-2 cursor-pointer"
+            class="py-2 cursor-pointer hover:bg-rose-200 rounded-lg px-2"
             @click="previewCity(searchResult)"
-          >
+           >
             {{ searchResult.name }} {{ searchResult.country }}
           </li>
         </template>
@@ -51,7 +50,6 @@ import SavedList from "../components/SavedList.vue"
 
 const router=useRouter()
 
-
 const previewCity = (searchResult) => {
 
   router.push({
@@ -65,7 +63,6 @@ const previewCity = (searchResult) => {
   });
 };
 
-
 const searchQuery = ref("");
 const queryTimeout = ref(null);
 const apiSearchResult = ref(null);
@@ -78,7 +75,7 @@ const getSearchResults = () => {
       try {
        
         const result = await axios.get(
-          `http://api.openweathermap.org/geo/1.0/direct?q=${searchQuery.value}&limit=5&appid=ac3048e6f359f99002e5352ee2f611ae`
+          `http://api.openweathermap.org/geo/1.0/direct?q=${searchQuery.value}&limit=5&appid=${import.meta.env.VITE_APP_API_KEY}`
         );
         console.log(result);
         apiSearchResult.value = result.data;
@@ -91,7 +88,5 @@ const getSearchResults = () => {
     apiSearchResult.value = null;
   }, 300);
 };
-
-
 
 </script>

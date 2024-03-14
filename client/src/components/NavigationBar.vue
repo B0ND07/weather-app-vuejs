@@ -1,6 +1,6 @@
 <template>
      <header class="sticky top-0 bg-rose-400 shadow-lg">
-        <nav class="container flex flex-col sm:flex-row items-center gap-4 text-white py-6">
+        <nav class="container flex flex-col justify-between sm:flex-row items-center gap-4 text-white py-6">
             <RouterLink :to="{name:'home'}">
             <div class="flex items-center gap-3 flex-1">
                 <i class="fa-solid fa-sun text-2xl"></i>
@@ -8,6 +8,7 @@
 
             </div>
         </RouterLink>
+        
         <div class="flex gap-3 flex-1 justify-end" v-if="route.params.city">
             <i
           v-if="isCitySaved"
@@ -19,6 +20,9 @@
           @click="addCity"
          ></i>
         </div>
+        <RouterLink to="/login">
+        <button class="text-gray-50 bg-red-500 hover:text-white-50 hover:bg-red-600 border-solid border py-2 px-2 rounded-lg w-18 text-center transition duration-200 box-border font-medium">Login</button>
+    </RouterLink>
 
         </nav>
 

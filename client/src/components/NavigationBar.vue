@@ -1,41 +1,38 @@
 <template>
-     <header class="sticky top-0 bg-rose-400 shadow-lg">
-        <nav class="container flex flex-col justify-between sm:flex-row items-center gap-4 text-white py-6">
-            <RouterLink :to="{name:'home'}">
-            <div class="flex items-center gap-3 flex-1">
-                <i class="fa-solid fa-sun text-2xl"></i>
-                <p class="text-2xl">VueWeather</p>
-
-            </div>
-        </RouterLink>
-        
-        <div class="flex gap-3 flex-1 justify-end" v-if="route.params.city">
-            <i
-          v-if="isCitySaved"
-          class="fa-solid fa-trash text-xl duration-150 cursor-pointer"
-          @click="removeCity"
-        ></i>
-            <i v-else
-          class="fa-solid fa-plus text-xl duration-150 cursor-pointer"
-          @click="addCity"
-         ></i>
+  <header class="sticky top-0 bg-rose-400 shadow-lg">
+    <nav class="container flex flex-col justify-between sm:flex-row items-center gap-4 text-white py-6">
+      <RouterLink :to="{ name: 'home' }">
+        <div class="flex items-center gap-3 flex-1">
+          <i class="fa-solid fa-sun text-2xl"></i>
+          <p class="text-2xl">VueWeather</p>
         </div>
-        <RouterLink to="/login">
+      </RouterLink>
+
+      <div class="flex gap-3 flex-1 justify-end" v-if="route.params.city">
+        <i v-if="isCitySaved" class="fa-solid fa-trash text-xl duration-150 cursor-pointer" @click="removeCity"></i>
+        <i v-else class="fa-solid fa-plus text-xl duration-150 cursor-pointer" @click="addCity"></i>
+      </div>
+
+      <RouterLink v-if="isLoggedIn" to="/">
+        <button @click="logout" class="text-gray-50 bg-red-500 hover:text-white-50 hover:bg-red-600 border-solid border py-2 px-2 rounded-lg w-18 text-center transition duration-200 box-border font-medium">Logout</button>
+      </RouterLink>
+
+      <RouterLink v-else to="/login">
         <button class="text-gray-50 bg-red-500 hover:text-white-50 hover:bg-red-600 border-solid border py-2 px-2 rounded-lg w-18 text-center transition duration-200 box-border font-medium">Login</button>
-    </RouterLink>
-
-        </nav>
-
-     </header>
+      </RouterLink>
+    </nav>
+  </header>
 </template>
 
 <script setup>
-import {RouterLink, useRoute, useRouter } from "vue-router"
-import { watch  } from '@vue/runtime-core';
+import { RouterLink, useRoute, useRouter } from "vue-router"
+import { useStore } from 'vuex';
+import { watch } from '@vue/runtime-core';
 import { uid } from "uid";
-import { ref } from "vue";
+import { ref, computed,onMounted } from "vue";
 
 const savedCities = ref([]);
+const store = useStore();
 const route = useRoute();
 const router = useRouter();
 const isCitySaved = ref(false);
@@ -46,16 +43,17 @@ const loadSavedCities = () => {
   }
 };
 
-const checkCitySaved = () => {
-  isCitySaved.value = savedCities.value.some(
-    (city) => city.city === route.params.city
-  );
-  console.log("isCitySaved:", isCitySaved.value);
+const logout = () => {
+  store.dispatch('logoutUser');
+  router.push('/');
 };
 
+const checkCitySaved = () => {
+  isCitySaved.value = savedCities.value.some((city) => city.city === route.params.city);
+};
 
 const addCity = () => {
-    loadSavedCities();
+  loadSavedCities();
 
   const locationObj = {
     id: uid(),
@@ -67,12 +65,9 @@ const addCity = () => {
   };
 
   savedCities.value.push(locationObj);
-  localStorage.setItem(
-    "savedCities",
-    JSON.stringify(savedCities.value)
-  );
+  localStorage.setItem("savedCities", JSON.stringify(savedCities.value));
 
-  let query = Object.assign({}, route.query);
+  let query = { ...route.query };
   delete query.preview;
   query.id = locationObj.id;
   router.replace({ query });
@@ -81,29 +76,27 @@ const addCity = () => {
 
 const removeCity = () => {
   const cities = JSON.parse(localStorage.getItem("savedCities"));
-  const updatedCities = cities.filter(
-    (city) => city.id !== route.query.id
-  );
-  localStorage.setItem(
-    "savedCities",
-    JSON.stringify(updatedCities)
-  );
-  router.push({
-    name: "home",
-  });
+  const updatedCities = cities.filter((city) => city.id !== route.query.id);
+  localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+  router.push({ name: "home" });
 };
 
-
-const modalActive = ref(null);
-const toggleModal = () => {
-  modalActive.value = !modalActive.value;
-};
 loadSavedCities();
 checkCitySaved();
 
+const isLoggedIn = computed(() => store.getters.isLoggedIn);
 
 watch(() => route.params.city, () => {
   loadSavedCities();
   checkCitySaved();
+});
+
+const reFetchUser = async () => {
+  // Assuming you have access to the store here
+  await store.dispatch('reFetchUser');
+};
+
+onMounted(() => {
+  reFetchUser(); // Call the function on component mount
 });
 </script>

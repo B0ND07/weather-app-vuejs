@@ -43,12 +43,14 @@
 </template>
 
 <script setup>
-import {ref} from "vue"
+import {ref } from "vue"
 import {useRouter} from "vue-router"
 import axios from "axios"
 import SavedList from "../components/SavedList.vue"
+import { useStore } from 'vuex';
 
 const router=useRouter()
+
 
 const previewCity = (searchResult) => {
 
@@ -88,5 +90,6 @@ const getSearchResults = () => {
     apiSearchResult.value = null;
   }, 300);
 };
+
 
 </script>

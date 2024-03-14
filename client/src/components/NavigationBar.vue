@@ -8,12 +8,17 @@
 
             </div>
         </RouterLink>
-        <div class="flex gap-3 flex-1 justify-end">
+        <div class="flex gap-3 flex-1 justify-end" v-if="route.params.city">
             <i
-          class="fa-solid fa-plus text-xl hover:text-weather-secondary duration-150 cursor-pointer"
+          v-if="isCitySaved"
+          class="fa-solid fa-trash text-xl duration-150 cursor-pointer"
+          @click="removeCity"
         ></i>
+            <i v-else
+          class="fa-solid fa-plus text-xl duration-150 cursor-pointer"
+          @click="addCity"
+         ></i>
         </div>
-
 
         </nav>
 
@@ -21,5 +26,80 @@
 </template>
 
 <script setup>
-import {RouterLink} from "vue-router"
+import {RouterLink, useRoute, useRouter } from "vue-router"
+import { watch  } from '@vue/runtime-core';
+import { uid } from "uid";
+import { ref } from "vue";
+
+const savedCities = ref([]);
+const route = useRoute();
+const router = useRouter();
+const isCitySaved = ref(false);
+
+const loadSavedCities = () => {
+  if (localStorage.getItem("savedCities")) {
+    savedCities.value = JSON.parse(localStorage.getItem("savedCities"));
+  }
+};
+
+const checkCitySaved = () => {
+  isCitySaved.value = savedCities.value.some(
+    (city) => city.city === route.params.city
+  );
+  console.log("isCitySaved:", isCitySaved.value);
+};
+
+
+const addCity = () => {
+    loadSavedCities();
+
+  const locationObj = {
+    id: uid(),
+    city: route.params.city,
+    coords: {
+      lat: route.query.lat,
+      lng: route.query.lng,
+    },
+  };
+
+  savedCities.value.push(locationObj);
+  localStorage.setItem(
+    "savedCities",
+    JSON.stringify(savedCities.value)
+  );
+
+  let query = Object.assign({}, route.query);
+  delete query.preview;
+  query.id = locationObj.id;
+  router.replace({ query });
+  checkCitySaved();
+};
+
+const removeCity = () => {
+  const cities = JSON.parse(localStorage.getItem("savedCities"));
+  const updatedCities = cities.filter(
+    (city) => city.id !== route.query.id
+  );
+  localStorage.setItem(
+    "savedCities",
+    JSON.stringify(updatedCities)
+  );
+  router.push({
+    name: "home",
+  });
+};
+
+
+const modalActive = ref(null);
+const toggleModal = () => {
+  modalActive.value = !modalActive.value;
+};
+loadSavedCities();
+checkCitySaved();
+
+
+watch(() => route.params.city, () => {
+  loadSavedCities();
+  checkCitySaved();
+});
 </script>

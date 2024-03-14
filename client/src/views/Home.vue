@@ -34,6 +34,11 @@
         </template>
       </ul>
 </div>
+<div class="flex flex-col gap-4">
+      <Suspense>
+        <SavedList />
+      </Suspense>
+    </div>
 
   </main>
 </template>
@@ -42,6 +47,7 @@
 import {ref} from "vue"
 import {useRouter} from "vue-router"
 import axios from "axios"
+import SavedList from "../components/SavedList.vue"
 
 const router=useRouter()
 
@@ -50,7 +56,7 @@ const previewCity = (searchResult) => {
 
   router.push({
     name: "city",
-    params: {state:searchResult.state, city: searchResult.name },
+    params: { city: searchResult.name },
     query: {
       lat: searchResult.lat,
       lng: searchResult.lon,

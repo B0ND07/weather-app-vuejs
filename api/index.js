@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import connect from "./config/db.js";
 import cors from "cors"
 import AuthRoute from "./routes/auth.js"
+import cityRoute from "./routes/city.js";
 
 config();
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors({origin:"*"}))
 connect();
 
 app.use("/api/auth", AuthRoute);
+app.use("/api/city", cityRoute);
 
 const PORT = process.env.PORT || 5000;
 

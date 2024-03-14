@@ -1,5 +1,22 @@
 import mongoose from "mongoose";
 
+const savedCity = new mongoose.Schema({
+  id: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  coords: {
+    lat: {
+      type: String,
+    },
+    lng: {
+      type: String,
+    },
+  },
+});
+
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -10,7 +27,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-    }
+    },
+    saved: [savedCity],
   },
   { timestamps: true } //timestamp
 );

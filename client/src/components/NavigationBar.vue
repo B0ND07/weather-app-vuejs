@@ -30,6 +30,7 @@ import { useStore } from 'vuex';
 import { watch } from '@vue/runtime-core';
 import { uid } from "uid";
 import { ref, computed,onMounted } from "vue";
+import axios from "axios"
 
 const savedCities = ref([]);
 const store = useStore();
@@ -37,10 +38,18 @@ const route = useRoute();
 const router = useRouter();
 const isCitySaved = ref(false);
 
-const loadSavedCities = () => {
-  if (localStorage.getItem("savedCities")) {
-    savedCities.value = JSON.parse(localStorage.getItem("savedCities"));
-  }
+const loadSavedCities = async() => {
+  const email = store.state.user ? store.state.user : null;
+  console.log(email);
+  const token = localStorage.getItem("token");
+  const response = await axios.get("http://localhost:5000/api/city/getcities", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },}
+  );
+  savedCities.value =response.data.savedCities
+  console.log("City added successfully:", response);
+
 };
 
 const logout = () => {
@@ -52,9 +61,8 @@ const checkCitySaved = () => {
   isCitySaved.value = savedCities.value.some((city) => city.city === route.params.city);
 };
 
-const addCity = () => {
+const addCity = async() => {
   loadSavedCities();
-
   const locationObj = {
     id: uid(),
     city: route.params.city,
@@ -64,8 +72,13 @@ const addCity = () => {
     },
   };
 
-  savedCities.value.push(locationObj);
-  localStorage.setItem("savedCities", JSON.stringify(savedCities.value));
+  const email = store.state.user ? store.state.user : null;
+
+  const response = await axios.post('http://localhost:5000/api/city/savecity', {
+      email: email, 
+      cityData: locationObj,
+    });
+    console.log('City added successfully:', response.data);
 
   let query = { ...route.query };
   delete query.preview;
@@ -74,10 +87,25 @@ const addCity = () => {
   checkCitySaved();
 };
 
-const removeCity = () => {
-  const cities = JSON.parse(localStorage.getItem("savedCities"));
+const removeCity = async() => {
+
+  const email = store.state.user ? store.state.user : null;
+  console.log(email);
+  const token = localStorage.getItem("token");
+  const response = await axios.get("http://localhost:5000/api/city/getcities", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },}
+  );
+  savedCities.value =response.data.savedCities
+  console.log("City added successfully:", response);
+
+  const cities =response.data.savedCities
   const updatedCities = cities.filter((city) => city.id !== route.query.id);
-  localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+  await axios.put('http://localhost:5000/api/city/updatecities', {
+  email: email,
+  updatedCities: updatedCities
+});
   router.push({ name: "home" });
 };
 
@@ -92,11 +120,10 @@ watch(() => route.params.city, () => {
 });
 
 const reFetchUser = async () => {
-  // Assuming you have access to the store here
   await store.dispatch('reFetchUser');
 };
 
 onMounted(() => {
-  reFetchUser(); // Call the function on component mount
+  reFetchUser(); 
 });
 </script>

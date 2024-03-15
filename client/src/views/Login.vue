@@ -99,6 +99,7 @@ const login = async () => {
       email: email.value,
       password: password.value,
     });
+    console.log(response);
     store.dispatch("loginUser", {
       user: response.data.user,
       token: response.data.token,

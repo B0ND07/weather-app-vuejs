@@ -20,7 +20,7 @@ const store = useStore();
 const getCities = async () => {
   const email = store.state.user ? store.state.user : null;
   const token = localStorage.getItem("token");
-  const response = await axios.get("http://localhost:5000/api/city/getcities", {
+  const response = await axios.get("/city/getcities", {
     headers: {
       Authorization: `Bearer ${token}`,
     },

@@ -11,36 +11,32 @@ export default createStore({
     setUser(state, user) {
       state.user = user;
       state.isLoggedIn = !!user; 
-      console.log('User set:', user);
-      console.log('IsLoggedIn:', state.isLoggedIn);
     },
     logout(state) {
       state.user = null;
       state.isLoggedIn = false;
       localStorage.removeItem("token");
-      console.log('User logged out');
+    
     },
     async reUser(state){
-        console.log("reusercheck");
         const token = localStorage.getItem("token");
         const data = await axios.get("http://localhost:5000/api/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
-          console.log(data);
-      
+       if(data.data.user){
           const userData = data.data.user.email;
           state.user =userData
           state.isLoggedIn = !!userData;
-          console.log(state.user);
+    
+        }
         },
     
   },
   actions: {
     loginUser({ commit }, { user }) {
       commit('setUser', user);
-  
     },
     logoutUser({ commit }) {
         commit('logout');

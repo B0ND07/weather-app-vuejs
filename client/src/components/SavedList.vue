@@ -19,30 +19,30 @@ const savedCities = ref([]);
 const store = useStore();
 const getCities = async () => {
   const email = store.state.user ? store.state.user : null;
-  console.log(email);
   const token = localStorage.getItem("token");
   const response = await axios.get("http://localhost:5000/api/city/getcities", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },}
-  );
-  savedCities.value =response.data.savedCities
-  console.log("City added successfully:", response);
-
-  const requests = [];
-  savedCities.value.forEach((city) => {
-    requests.push(
-      axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=7efa332cf48aeb9d2d391a51027f1a71&units=imperial`
-      )
-    );
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
+  if (response.data.savedCities) {
+    savedCities.value = response.data.savedCities;
 
-  const weatherData = await Promise.all(requests);
+    const requests = [];
+    savedCities.value.forEach((city) => {
+      requests.push(
+        axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=7efa332cf48aeb9d2d391a51027f1a71&units=imperial`
+        )
+      );
+    });
 
-  weatherData.forEach((value, index) => {
-    savedCities.value[index].weather = value.data;
-  });
+    const weatherData = await Promise.all(requests);
+
+    weatherData.forEach((value, index) => {
+      savedCities.value[index].weather = value.data;
+    });
+  }
 };
 
 await getCities();

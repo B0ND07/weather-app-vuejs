@@ -59,7 +59,7 @@ const isCitySaved = ref(false);
 const loadSavedCities = async () => {
   const email = store.state.user ? store.state.user : null;
   const token = localStorage.getItem("token");
-  const response = await axios.get("http://localhost:5000/api/city/getcities", {
+  const response = await axios.get("/city/getcities", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -94,7 +94,7 @@ const addCity = async () => {
     },
   };
 
-  const response = await axios.post("http://localhost:5000/api/city/savecity", {
+  const response = await axios.post("/city/savecity", {
     email: email,
     cityData: locationObj,
   });
@@ -108,7 +108,7 @@ const removeCity = async () => {
   const email = store.state.user ? store.state.user : null;
 
   const token = localStorage.getItem("token");
-  const response = await axios.get("http://localhost:5000/api/city/getcities", {
+  const response = await axios.get("/city/getcities", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -117,7 +117,7 @@ const removeCity = async () => {
 
   const cities = response.data.savedCities;
   const updatedCities = cities.filter((city) => city.id !== route.query.id);
-  await axios.put("http://localhost:5000/api/city/updatecities", {
+  await axios.put("/city/updatecities", {
     email: email,
     updatedCities: updatedCities,
   });

@@ -85,7 +85,7 @@ const password = ref("");
 const register = async () => {
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/register",
+      "/auth/register",
       {
         email: email.value,
         password: password.value,

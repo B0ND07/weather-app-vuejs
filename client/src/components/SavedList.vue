@@ -13,12 +13,11 @@ import axios from "axios";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import SavedCard from "./SavedCard.vue";
-import { useStore } from "vuex";
+
 
 const savedCities = ref([]);
-const store = useStore();
+
 const getCities = async () => {
-  const email = store.state.user ? store.state.user : null;
   const token = localStorage.getItem("token");
   const response = await axios.get("/city/getcities", {
     headers: {

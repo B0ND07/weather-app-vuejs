@@ -76,13 +76,17 @@
 </template>
 
 <script setup>
+import {  useRouter } from "vue-router";
 import axios from "axios";
 import { ref } from "vue";
+import { useStore } from "vuex";
 import { useToast } from "vue-toastification";
 const toast = useToast();
 
 const email = ref("");
 const password = ref("");
+const store = useStore();
+const router = useRouter();
 
 const register = async () => {
   try {

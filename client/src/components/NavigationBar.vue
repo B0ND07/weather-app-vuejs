@@ -49,7 +49,9 @@ import { watch } from "@vue/runtime-core";
 import { uid } from "uid";
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const savedCities = ref([]);
 const store = useStore();
 const route = useRoute();
@@ -57,7 +59,6 @@ const router = useRouter();
 const isCitySaved = ref(false);
 
 const loadSavedCities = async () => {
-  const email = store.state.user ? store.state.user : null;
   const token = localStorage.getItem("token");
   const response = await axios.get("/city/getcities", {
     headers: {
@@ -79,6 +80,7 @@ const checkCitySaved = () => {
 };
 
 const addCity = async () => {
+  try{
   const email = store.state.user ? store.state.user : null;
   if (!email && email == null) {
     router.push("/login");
@@ -98,13 +100,19 @@ const addCity = async () => {
     email: email,
     cityData: locationObj,
   });
-  alert("saved successfully");
+  // alert("saved successfully");
+  toast.success("Saved...!")
   router.push("/");
 
-  checkCitySaved();
+  checkCitySaved();}
+  catch(err){
+    toast.error("Error...!")
+    console.log(err);
+  }
 };
 
 const removeCity = async () => {
+  try{
   const email = store.state.user ? store.state.user : null;
 
   const token = localStorage.getItem("token");
@@ -121,7 +129,12 @@ const removeCity = async () => {
     email: email,
     updatedCities: updatedCities,
   });
-  router.push({ name: "home" });
+  toast.success("Deleted...!")
+  router.push({ name: "home" });}
+  catch(err){
+    toast.error("Error...!")
+    console.log(err);
+  }
 };
 
 loadSavedCities();

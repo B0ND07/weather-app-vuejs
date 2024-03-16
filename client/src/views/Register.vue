@@ -78,6 +78,8 @@
 <script setup>
 import axios from "axios";
 import { ref } from "vue";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 
 const email = ref("");
 const password = ref("");
@@ -91,7 +93,19 @@ const register = async () => {
         password: password.value,
       }
     );
+    store.dispatch("loginUser", {
+      user: response.data.user,
+      token: response.data.token,
+    });
+    
+    localStorage.setItem("token", response.data.token);
+
+    if (response.data.user) {
+      router.push("/");
+    }
+    toast.success("Logged in...!")
   } catch (error) {
+    toast.error("Error...!")
     console.error("Registration failed:", error);
   }
 };

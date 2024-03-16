@@ -92,11 +92,20 @@
 <script setup>
 import axios from "axios";
 import { useRoute, useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
+const toast = useToast();
+
+
+
+
 
 const route = useRoute();
 const city = route.params.city;
+
 const getWeatherData = async () => {
+
   try {
+    toast.info("Loading...!")
     const apikey = import.meta.env.VITE_APP_API_KEY;
     const weatherData = await axios.get(
       `https://api.openweathermap.org/data/3.0/onecall?lat=${route.query.lat}&lon=${route.query.lng}&appid=${apikey}&units=imperial`
@@ -113,9 +122,10 @@ const getWeatherData = async () => {
       const utc = hour.dt * 1000 + localOffset;
       hour.currentTime = utc + 1000 * weatherData.data.timezone_offset;
     });
-
+    toast.success("Done!")
     return weatherData.data;
   } catch (err) {
+    toast.error("Error...!")
     console.log(err);
   }
 };
